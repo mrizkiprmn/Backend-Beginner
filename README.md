@@ -1,4 +1,4 @@
-# Backend REST API Figma
+# Backend Beginner
 
 ##### Backend build with postgreSQL, express.js, node.js & test API with postman
 
