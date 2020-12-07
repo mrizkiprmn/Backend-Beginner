@@ -1,73 +1,124 @@
-const db = require("../Configs/db");
-require("../Controllers/product");
+const db = require('../Configs/db');
 const product = {};
 
-product.get = () => {
-    return new Promise((resolve, reject) => {
-        db.query("SELECT * FROM public.product ORDER BY price DESC")
-        .then((res) => {
-         if (res.rows.length == 0) {
-             resolve("Data is Empty");
-         } else {
-             resolve(res.rows);
-         }
-        })
-        .catch((err) => {
-            reject(err);
-        })
-    })
-}
 
-product.getName = (data) => {
+product.getAll= () => {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM public.product WHERE name LIKE '${data}%'`)
+      db.query("SELECT product.id, product.name, product.price, product.image, category.name AS category FROM public.product LEFT JOIN public.category ON category.id = product.id_category ORDER BY product.id ASC")
         .then((res) => {
+          if (res.rows.length == 0) {
+            resolve('Product is empty!');
+          } else {
             resolve(res.rows);
+          };
         })
         .catch((err) => {
-            reject(err);
-        })
-    })
-}
+          reject(err);
+        });
+    });
+  };
 
 
-product.add = (data) => {
+product.getSearch = (name) => {
     return new Promise((resolve, reject) => {
-        db.query(`INSERT INTO public.product(name, image, price, category) VALUES ('${data.name}', '${data.image}', ${data.price}, '${data.category}')`)
+      db.query(`SELECT product.id,
+                  product.name, 
+                  product.price, 
+                  product.image, 
+                  category.name AS category
+          FROM public.product 
+          LEFT JOIN public.category 
+          ON category.id = product.id_category
+          WHERE product.name
+            ILIKE '%${name}%'`,)
         .then((res) => {
-            resolve(data);
+          if (res.rows.length == 0) {
+            resolve('Data not found');
+          } else {
+            resolve(res.rows);
+          };
         })
         .catch((err) => {
-            reject(err);
-        })
-    })
-}
+          reject(err);
+        });
+    });
+  };
 
-product.update = (data) => {
+
+product.getSort= (order, sort) => {
     return new Promise((resolve, reject) => {
-        db.query(`UPDATE public.product SET name='${data.name}', image='${data.image}' , price=${data.price}, category='${data.category}' WHERE idfood=${data.idfood}`)
+      db.query(
+        `SELECT product.id, product.name, product.price, product.image, category.name AS category FROM public.product LEFT JOIN public.category ON category.id = product.id_category ORDER BY ${order} ${sort}`,
+      )
         .then((res) => {
-            resolve(data);
+          if (res.rows.length == 0) {
+            resolve('Data not found');
+          } else {
+            resolve(res.rows);
+          };
         })
         .catch((err) => {
-            reject(err);
-        })
-    })
-}
+          reject('Data not sorted');
+        });
+    });
+  };
 
-product.del= (data) => {
+
+product.get= (id) => {
     return new Promise((resolve, reject) => {
-        db.query(`DELETE FROM public.product WHERE idfood=${data}`)
+      db.query(
+        `SELECT product.id, product.name, product.price, product.image, category.name AS category FROM public.product LEFT JOIN public.category ON category.id = product.id_category WHERE product.id=${id}`,
+      )
         .then((res) => {
-            resolve(data);
+          if (res.rows.length == 0) {
+            resolve('Data not found');
+          } else {
+            resolve(res.rows);
+          };
         })
         .catch((err) => {
-            reject(err);
+          reject(err);
+        });
+    });
+  };
+
+
+product.add = (data) =>{
+    return new Promise((resolve, reject) =>{
+        db.query(`INSERT INTO public.product(name, price, image, id_category) VALUES ('${data.name}',  ${data.price}, '${data.image}', '${data.id_category}')`)
+        .then((res) => {
+            resolve(data)
         })
-    })
-}
+        .catch((err) => {
+            reject("Data not completed")
+        });
+    });
+};
+
+product.update = (data) =>{
+    return new Promise((resolve, reject) =>{
+        db.query(`UPDATE public.product SET name='${data.name}', price=${data.price},  image='${data.image}', id_category='${data.id_category}' WHERE id=${data.id}`)
+        .then((res) => {
+            resolve(data)
+        })
+        .catch((err) => {
+            reject("Data not completed")
+        });
+    });
+};
 
 
+product.del= (id) =>{
+    return new Promise((resolve, reject) =>{
+        db.query(`DELETE FROM public.product WHERE id=${id}`)
+        .then((res) => {
+            resolve(id)
+        })
+        .catch((err) => {
+            reject("id not found")
+        });
+    });
+};
 
 
 
