@@ -37,7 +37,7 @@ categories.update = (data) =>{
             resolve(data);
         })
         .catch((err) => {
-            reject(err);
+            reject("Data not completed");
         });
     });
 };
